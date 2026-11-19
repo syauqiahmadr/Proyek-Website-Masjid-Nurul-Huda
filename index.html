@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Website resmi Masjid Nurul Huda, Mojosongo, Boyolali: jadwal sholat, jadwal imam sholat Jumat, kegiatan, dan pengumuman.">
+  <title>Masjid Nurul Huda | Pusat Ibadah dan Kegiatan Umat</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="#beranda" class="logo">
+        <img src="logo.jpeg.jpeg" alt="Logo Masjid Nurul Huda" class="logo-img">
+        <span class="logo-text">Masjid <strong>Nurul Huda</strong></span>
+      </a>
+      <nav class="main-nav" aria-label="Navigasi utama">
+        <ul>
+          <li><a href="#beranda">Beranda</a></li>
+          <li><a href="#jadwal">Jadwal Sholat</a></li>
+          <li><a href="#jumat">Imam Jumat</a></li>
+          <li><a href="#kegiatan">Kegiatan</a></li>
+          <li><a href="#berita">Pengumuman</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+
+    <section id="beranda" class="hero">
+      <div class="container hero-inner">
+        <p class="hero-salam">Assalamu'alaikum Warahmatullahi Wabarakatuh</p>
+        <h1>Selamat Datang di Masjid Nurul Huda</h1>
+        <p class="hero-desc">
+          Tambak, RT 04, RW 02, Kel.Tambak, Mojosongo, Boyolali
+        </p>
+        <div class="hero-actions">
+          <a href="#jadwal" class="btn btn-primary">Lihat Jadwal Sholat</a>
+          <a href="#kegiatan" class="btn btn-outline">Lihat Kegiatan</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="dalil-ticker" aria-live="off">
+      <div class="container">
+        <div class="ticker-box" id="ticker-box">
+          <p class="ticker-arab" id="ticker-arab" lang="ar" dir="rtl"></p>
+          <p class="ticker-arti" id="ticker-arti"></p>
+          <p class="ticker-sumber" id="ticker-sumber"></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="jadwal" class="section">
+      <div class="container">
+        <header class="section-head">
+          <h2>Jadwal Sholat</h2>
+          <p>Wilayah Boyolali, Jawa Tengah &mdash; <span id="tanggal-hari-ini">Kamis, 29 Oktober 2026</span>.</p>
+        </header>
+
+        <div class="countdown" aria-live="off">
+          <p class="countdown-label">Menuju sholat <strong id="countdown-nama">-</strong></p>
+          <p class="countdown-timer" id="countdown-timer">00:00:00</p>
+        </div>
+
+        <div class="prayer-grid">
+          <article class="prayer-card" data-sholat="subuh">
+            <h3>Subuh</h3>
+            <p class="prayer-time" id="waktu-subuh">04:04</p>
+          </article>
+          <article class="prayer-card" data-sholat="dzuhur">
+            <h3>Dzuhur</h3>
+            <p class="prayer-time" id="waktu-dzuhur">11:24</p>
+          </article>
+          <article class="prayer-card" data-sholat="ashar">
+            <h3>Ashar</h3>
+            <p class="prayer-time" id="waktu-ashar">14:30</p>
+          </article>
+          <article class="prayer-card" data-sholat="maghrib">
+            <h3>Maghrib</h3>
+            <p class="prayer-time" id="waktu-maghrib">17:33</p>
+          </article>
+          <article class="prayer-card" data-sholat="isya">
+            <h3>Isya</h3>
+            <p class="prayer-time" id="waktu-isya">18:43</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="jumat" class="section section-alt">
+      <div class="container">
+        <header class="section-head">
+          <h2>Jadwal Imam Sholat Jumat</h2>
+          <p>Berdasarkan hari Jumat pasaran Jawa.</p>
+        </header>
+
+        <div class="imam-utama" id="imam-utama"></div>
+        <div class="imam-grid" id="imam-grid"></div>
+      </div>
+    </section>
+
+    <script>
+      (function () {
+        var zona = "Asia/Jakarta";
+        var pasaran = ["Legi", "Pahing", "Pon", "Wage", "Kliwon"];
+        var bulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        var jumlahJumat = 8;
+        var msHari = 86400000;
+
+        var imamPasaran = {
+          Legi: "Kh.Muhammad Maulidirridlo S.kom M.kom Magic.com",
+          Pahing: "Ir.H. Rizqy Ardian Pratama S.kom M.kom",
+          Pon: "Gus Syauqi Ahmad Ridlo S.Pt M.Pt",
+          Wage: "Drs. Regza Muiz Saputra S.Kel ",
+          Kliwon: "Ust. Andika Nugroho Lc"
+        };
+
+        var acuanJumat = Date.UTC(2026, 10, 13) / msHari;
+        var acuanPasaran = 3;
+
+        var bagian = new Intl.DateTimeFormat("en-GB", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          timeZone: zona
+        }).formatToParts(new Date());
+        var n = {};
+        bagian.forEach(function (p) { n[p.type] = parseInt(p.value, 10); });
+
+        var hariIni = Date.UTC(n.year, n.month - 1, n.day) / msHari;
+        var hariMinggu = new Date(hariIni * msHari).getUTCDay();
+        var jumatPertama = hariIni + ((5 - hariMinggu + 7) % 7);
+
+        var wadahUtama = document.getElementById("imam-utama");
+        var wadahGrid = document.getElementById("imam-grid");
+
+        function el(tag, kelas, teks) {
+          var e = document.createElement(tag);
+          if (kelas) { e.className = kelas; }
+          if (teks !== undefined) { e.textContent = teks; }
+          return e;
+        }
+
+        for (var i = 0; i < jumlahJumat; i++) {
+          var h = jumatPertama + i * 7;
+          var d = new Date(h * msHari);
+          var teksTgl = d.getUTCDate() + " " + bulan[d.getUTCMonth()] + " " + d.getUTCFullYear();
+          var selisihHari = h - acuanJumat;
+          var ip = (((selisihHari % 5) + 5) % 5 + acuanPasaran) % 5;
+          var namaPasaran = pasaran[ip];
+          var nama = imamPasaran[namaPasaran];
+
+          if (i === 0) {
+            var utama = el("div", "imam-utama-kartu");
+            utama.appendChild(el("span", "imam-label", h === hariIni ? "Hari Ini" : "Jumat Terdekat"));
+            utama.appendChild(el("h3", "imam-utama-hari", "Jumat " + namaPasaran));
+            utama.appendChild(el("p", "imam-utama-tanggal", teksTgl));
+            utama.appendChild(el("div", "imam-garis"));
+            utama.appendChild(el("span", "imam-judul", "Imam Sholat Jumat"));
+            utama.appendChild(el("p", "imam-utama-nama", nama));
+            wadahUtama.appendChild(utama);
+          } else {
+            var kartu = el("article", "imam-kartu");
+            kartu.appendChild(el("span", "imam-pasaran", "Jumat " + namaPasaran));
+            kartu.appendChild(el("h3", "imam-tanggal", teksTgl));
+            kartu.appendChild(el("p", "imam-nama", nama));
+            wadahGrid.appendChild(kartu);
+          }
+        }
+      })();
+    </script>
+
+    <section id="kegiatan" class="section">
+      <div class="container">
+        <header class="section-head">
+          <h2>Kegiatan Rutin</h2>
+          <p>Agenda yang terbuka untuk jamaah dan masyarakat umum.</p>
+        </header>
+
+        <div class="card-grid">
+          <article class="card card-single">
+            <div class="card-icon" aria-hidden="true">&#127769;</div>
+            <h3>Barzanji</h3>
+            <p>Pembacaan Maulid Al-Barzanji dan shalawat bersama jamaah. Terbuka untuk seluruh warga.</p>
+            <span class="tag">Setiap Sabtu, ba'da Maghrib</span>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="berita" class="section section-alt">
+      <div class="container">
+        <header class="section-head">
+          <h2>Berita &amp; Pengumuman</h2>
+          <p>Kabar terbaru dari lingkungan Masjid Nurul Huda.</p>
+        </header>
+
+        <p class="empty-state">Belum ada pengumuman saat ini.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <address class="footer-address">
+        <strong>Masjid Nurul Huda</strong><br>
+        Mojosongo, Boyolali, Jawa Tengah
+      </address>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var dalil = [
+        {
+          arab: "إِنَّمَا يَعْمُرُ مَسَاجِدَ اللَّهِ مَنْ آمَنَ بِاللَّهِ وَالْيَوْمِ الْآخِرِ وَأَقَامَ الصَّلَاةَ وَآتَى الزَّكَاةَ وَلَمْ يَخْشَ إِلَّا اللَّهَ فَعَسَىٰ أُولَٰئِكَ أَنْ يَكُونُوا مِنَ الْمُهْتَدِينَ",
+          arti: "Sesungguhnya yang memakmurkan masjid-masjid Allah hanyalah orang yang beriman kepada Allah dan hari kemudian, mendirikan sholat, menunaikan zakat, dan tidak takut kepada siapa pun selain Allah. Maka mereka itulah yang diharapkan termasuk golongan yang mendapat petunjuk.",
+          sumber: "QS. At-Taubah: 18"
+        },
+        {
+          arab: "مَنْ تَطَهَّرَ فِي بَيْتِهِ ثُمَّ مَشَى إِلَى بَيْتٍ مِنْ بُيُوتِ اللَّهِ لِيَقْضِيَ فَرِيضَةً مِنْ فَرَائِضِ اللَّهِ كَانَتْ خُطُوَاتُهُ إِحْدَاهَا تَحُطُّ خَطِيئَةً وَالْأُخْرَى تَرْفَعُ دَرَجَةً",
+          arti: "Barangsiapa bersuci di rumahnya, lalu berjalan menuju salah satu rumah Allah untuk menunaikan kewajiban dari Allah, maka langkah-langkahnya: satu langkah menghapus dosa dan langkah lainnya mengangkat derajat.",
+          sumber: "HR. Muslim"
+        },
+        {
+          arab: "صَلَاةُ الْجَمَاعَةِ تَفْضُلُ صَلَاةَ الْفَذِّ بِسَبْعٍ وَعِشْرِينَ دَرَجَةً",
+          arti: "Sholat berjamaah lebih utama daripada sholat sendirian dengan selisih dua puluh tujuh derajat.",
+          sumber: "HR. Bukhari dan Muslim"
+        },
+        {
+          arab: "وَاسْتَعِينُوا بِالصَّبْرِ وَالصَّلَاةِ ۚ وَإِنَّهَا لَكَبِيرَةٌ إِلَّا عَلَى الْخَاشِعِينَ",
+          arti: "Mohonlah pertolongan (kepada Allah) dengan sabar dan sholat. Dan sesungguhnya sholat itu berat, kecuali bagi orang-orang yang khusyuk.",
+          sumber: "QS. Al-Baqarah: 45"
+        },
+        {
+          arab: "وَرَجُلٌ قَلْبُهُ مُعَلَّقٌ فِي الْمَسَاجِدِ",
+          arti: "Di antara tujuh golongan yang dinaungi Allah pada hari yang tidak ada naungan selain naungan-Nya adalah seseorang yang hatinya terikat dengan masjid.",
+          sumber: "HR. Bukhari dan Muslim"
+        },
+        {
+          arab: "مَنْ بَنَى مَسْجِدًا لِلَّهِ بَنَى اللَّهُ لَهُ مِثْلَهُ فِي الْجَنَّةِ",
+          arti: "Barangsiapa membangun masjid karena Allah, maka Allah akan membangunkan untuknya yang semisal di surga.",
+          sumber: "HR. Bukhari dan Muslim"
+        }
+      ];
+
+      var box = document.getElementById("ticker-box");
+      var elArab = document.getElementById("ticker-arab");
+      var elArti = document.getElementById("ticker-arti");
+      var elSumber = document.getElementById("ticker-sumber");
+      var indeks = 0;
+
+      function tampil(i) {
+        elArab.textContent = dalil[i].arab;
+        elArti.textContent = dalil[i].arti;
+        elSumber.textContent = dalil[i].sumber;
+      }
+
+      function ganti() {
+        box.classList.add("hilang");
+        setTimeout(function () {
+          indeks = (indeks + 1) % dalil.length;
+          tampil(indeks);
+          box.classList.remove("hilang");
+        }, 400);
+      }
+
+      tampil(indeks);
+      setInterval(ganti, 3000);
+    })();
+  </script>
+
+  <script>
+    (function () {
+      var zona = "Asia/Jakarta";
+      var sekarang = new Date();
+
+      var teksTanggal = new Intl.DateTimeFormat("id-ID", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+        timeZone: zona
+      }).format(sekarang);
+      document.getElementById("tanggal-hari-ini").textContent = teksTanggal;
+
+      var bagian = new Intl.DateTimeFormat("en-GB", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        timeZone: zona
+      }).formatToParts(sekarang);
+      var nilai = {};
+      bagian.forEach(function (p) { nilai[p.type] = p.value; });
+      var tgl = nilai.day + "-" + nilai.month + "-" + nilai.year;
+
+      var url = "https://api.aladhan.com/v1/timings/" + tgl +
+        "?latitude=-7.5323&longitude=110.5963&method=20&timezonestring=" + zona;
+
+      function bersihkan(jam) {
+        return String(jam).slice(0, 5);
+      }
+
+      fetch(url)
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          var t = data.data.timings;
+          document.getElementById("waktu-subuh").textContent = bersihkan(t.Fajr);
+          document.getElementById("waktu-dzuhur").textContent = bersihkan(t.Dhuhr);
+          document.getElementById("waktu-ashar").textContent = bersihkan(t.Asr);
+          document.getElementById("waktu-maghrib").textContent = bersihkan(t.Maghrib);
+          document.getElementById("waktu-isya").textContent = bersihkan(t.Isha);
+          hitungMundur();
+        })
+        .catch(function () {});
+
+      var daftar = [
+        { kunci: "subuh", nama: "Subuh" },
+        { kunci: "dzuhur", nama: "Dzuhur" },
+        { kunci: "ashar", nama: "Ashar" },
+        { kunci: "maghrib", nama: "Maghrib" },
+        { kunci: "isya", nama: "Isya" }
+      ];
+
+      var elNama = document.getElementById("countdown-nama");
+      var elTimer = document.getElementById("countdown-timer");
+
+      function detikSekarang() {
+        var p = new Intl.DateTimeFormat("en-GB", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hourCycle: "h23",
+          timeZone: zona
+        }).formatToParts(new Date());
+        var n = {};
+        p.forEach(function (x) { n[x.type] = parseInt(x.value, 10); });
+        return n.hour * 3600 + n.minute * 60 + n.second;
+      }
+
+      function detikWaktu(kunci) {
+        var teks = document.getElementById("waktu-" + kunci).textContent.split(":");
+        return parseInt(teks[0], 10) * 3600 + parseInt(teks[1], 10) * 60;
+      }
+
+      function dua(n) {
+        return n < 10 ? "0" + n : String(n);
+      }
+
+      function hitungMundur() {
+        var kini = detikSekarang();
+        var berikut = null;
+        var selisih = 0;
+
+        for (var i = 0; i < daftar.length; i++) {
+          var target = detikWaktu(daftar[i].kunci);
+          if (target > kini) {
+            berikut = daftar[i];
+            selisih = target - kini;
+            break;
+          }
+        }
+
+        if (!berikut) {
+          berikut = daftar[0];
+          selisih = detikWaktu(berikut.kunci) + 86400 - kini;
+        }
+
+        var jam = Math.floor(selisih / 3600);
+        var menit = Math.floor((selisih % 3600) / 60);
+        var detik = selisih % 60;
+
+        elNama.textContent = berikut.nama;
+        elTimer.textContent = dua(jam) + ":" + dua(menit) + ":" + dua(detik);
+
+        var kartu = document.querySelectorAll(".prayer-card");
+        for (var j = 0; j < kartu.length; j++) {
+          if (kartu[j].getAttribute("data-sholat") === berikut.kunci) {
+            kartu[j].classList.add("prayer-next");
+          } else {
+            kartu[j].classList.remove("prayer-next");
+          }
+        }
+      }
+
+      hitungMundur();
+      setInterval(hitungMundur, 1000);
+    })();
+  </script>
+
+</body>
+</html>
